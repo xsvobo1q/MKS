@@ -24,14 +24,45 @@
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
+uint8_t code[32] = {1,0,1,0,1,0,0,1,1,1,0,1,1,1,0,1,1,1,0,0,1,0,1,0,1,0,0,0,0,0,0,0};
+uint32_t Code = 0b10101001110111011100101010000000;
+uint32_t helpCode = 0b10101001110111011100101010000000;;
+
+
 int main(void)
 {
 	RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
 	GPIOA->MODER |= GPIO_MODER_MODER5_0;
 
     /* Loop forever */
+
 	while(1){
-		GPIOA->ODR ^= (1<<5); // toggle
-		for (volatile uint32_t i = 0; i < 100000; i++) {}
+		for(int i = 0; i < 32; i++){
+			if(code[i]){
+				GPIOA->BSRR = (1<<5); // set
+			}else{
+				GPIOA->BRR = (1<<5); // reset
+			}
+			for (volatile uint32_t i = 0; i < 100000; i++) {}
+		}
 	}
+
+
+	/*
+	uint8_t n = 0;
+	while(1){
+		helpCode = helpCode >> 1;
+		if(helpCode & 1){
+			GPIOA->BSRR = (1<<5); // set
+		}else{
+			GPIOA->BRR = (1<<5); // reset
+		}
+		for (volatile uint32_t i = 0; i < 100000; i++) {}
+		n++;
+		if(n == 32){
+			helpCode = Code;
+			n = 0;
+		}
+	}
+	*/
 }
