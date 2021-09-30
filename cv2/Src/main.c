@@ -18,6 +18,7 @@
  */
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "stm32f0xx.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
@@ -35,30 +36,32 @@ void SysTick_Handler(void){
 }
 
 void tlacitka(void){
-	static uint32_t old_s2;
-	static uint32_t old_s1;
-	static uint32_t off_time;
+	static uint16_t debounce_s1 = 0xFFFF;
+	static uint16_t debounce_s2 = 0xFFFF;
 	static uint32_t delay;
-	uint32_t new_s2 = GPIOC->IDR & (1<<0);
-	uint32_t new_s1 = GPIOC->IDR & (1<<1);
-	if (Tick > delay + 40){
-		if (old_s2 && !new_s2) { // falling edge
-			off_time = Tick + LED_TIME_SHORT;
-			GPIOB->BSRR = (1<<0);
-		}
-		if (old_s1 && !new_s1){
+	static uint32_t off_time;
+	bool s1 = GPIOC->IDR & (1<<1);
+	bool s2 = GPIOC->IDR & (1<<0);
+
+	if (Tick > delay + 5){
+		debounce_s1 <<= 1;
+		debounce_s2 <<= 1;
+		if (s1) debounce_s1 |= 0x0001;
+		if (debounce_s1 == 0x7FFF){
 			off_time = Tick + LED_TIME_LONG;
 			GPIOB->BSRR = (1<<0);
 		}
-		old_s2 = new_s2;
-		old_s1 = new_s1;
-
-		if (Tick > off_time) {
-			GPIOB->BRR = (1<<0);
+		if (s2) debounce_s2 |= 0x0001;
+		if (debounce_s2 == 0x7FFF){
+			off_time = Tick + LED_TIME_SHORT;
+			GPIOB->BSRR = (1<<0);
 		}
-		delay = Tick;
+	}
+	if (Tick > off_time){
+		GPIOB->BRR = (1<<0);
 	}
 }
+
 
 void blikac(void)
 {
@@ -82,7 +85,6 @@ int main(void)
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 
 	while(1){
-		/*Empty loop*/
 		blikac();
 		tlacitka();
 	}
