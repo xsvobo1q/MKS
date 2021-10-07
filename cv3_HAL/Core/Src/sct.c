@@ -8,41 +8,26 @@
 #include <stdint.h>
 #include "stm32f0xx.h"
 #include "sct.h"
+#include "main.h"
 
-/*  Inicializace HW (povoleni hodin pro port B a nastaveni vystupu  */
 void sct_init(void){
-
-	/*
-	 * 	SDI	->	PB4
-	 * 	CLK	->	PB3
-	 * 	LA	->	PB5
-	 * 	OE	->	PB10
-	 */
-
-	RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
-	GPIOB->MODER |= GPIO_MODER_MODER10_0;
-	GPIOB->MODER |= GPIO_MODER_MODER5_0;
-	GPIOB->MODER |= GPIO_MODER_MODER4_0;
-	GPIOB->MODER |= GPIO_MODER_MODER3_0;
+	sct_led(0);
 }
 
-/*  Fce plnici shift registr 32 bit slovem  */
 void sct_led(uint32_t value){
 	for( uint8_t i = 0; i < 32; i++ ){
 		sct_sdi(value & 1);
-		sct_clk(1);
-		sct_clk(0);
+		HAL_GPIO_WritePin(SCT_CLK_GPIO_Port, SCT_CLK_Pin, 1);
+		HAL_GPIO_WritePin(SCT_CLK_GPIO_Port, SCT_CLK_Pin, 0);
 		value >>= 1;
 	}
-	sct_nla(1);
-	sct_nla(0);
+	HAL_GPIO_WritePin(SCT_LA_GPIO_Port, SCT_LA_Pin, 1);
+	HAL_GPIO_WritePin(SCT_LA_GPIO_Port, SCT_LA_Pin, 0);
 }
 
-/*  Fce pro preklad cislovek na segmenty  */
 void sct_value(uint16_t value){
 	uint32_t reg = 0;
 
-	/*  Preklad cislovek na jednotlive segmenty  */
 	static const uint32_t reg_values[3][10] = {
 			{
 					//PCDE--------GFAB @ DIS1
