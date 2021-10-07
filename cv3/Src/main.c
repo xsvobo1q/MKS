@@ -27,11 +27,12 @@
 
 int main(void)
 {
-	uint32_t value = 0x7A5C36DE;
 	sct_init();
-	sct_led(value);
 	while(1){
-
+		for(uint16_t i = 0; i<1000; i+=111){
+			sct_value(i);
+			for(uint32_t time = 0; time < 100000; time++);
+		}
 	}
 
 }
