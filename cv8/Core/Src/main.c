@@ -21,7 +21,6 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "lis2dw12_reg.h"
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -78,21 +77,21 @@ static stmdev_ctx_t lis2dw12 = {
 
 int _write(int file, char const *buf, int n)
 {
- /* stdout redirection to UART2 */
- HAL_UART_Transmit(&huart2, (uint8_t*)(buf), n, HAL_MAX_DELAY);
- return n;
+	/* stdout redirection to UART2 */
+	HAL_UART_Transmit(&huart2, (uint8_t*)(buf), n, HAL_MAX_DELAY);
+	return n;
 }
 
 static int32_t platform_write(void *handle, uint8_t reg, uint8_t *bufp, uint16_t len)
 {
- HAL_I2C_Mem_Write(handle, LIS2DW12_I2C_ADD_H, reg, I2C_MEMADD_SIZE_8BIT, bufp, len, 1000);
- return 0;
+	HAL_I2C_Mem_Write(handle, LIS2DW12_I2C_ADD_H, reg, I2C_MEMADD_SIZE_8BIT, bufp, len, 1000);
+	return 0;
 }
 
 static int32_t platform_read(void *handle, uint8_t reg, uint8_t *bufp, uint16_t len)
 {
- HAL_I2C_Mem_Read(handle, LIS2DW12_I2C_ADD_H, reg, I2C_MEMADD_SIZE_8BIT, bufp, len, 1000);
- return 0;
+	HAL_I2C_Mem_Read(handle, LIS2DW12_I2C_ADD_H, reg, I2C_MEMADD_SIZE_8BIT, bufp, len, 1000);
+	return 0;
 }
 
 /* USER CODE END 0 */
@@ -384,8 +383,8 @@ void StartDefaultTask(void const * argument)
 /* USER CODE END Header_StartVisualTask */
 void StartVisualTask(void const * argument)
 {
-  /* USER CODE BEGIN StartVisualTask */
-  /* Infinite loop */
+	/* USER CODE BEGIN StartVisualTask */
+	/* Infinite loop */
 	while(1){
 
 		int16_t msg;
@@ -403,7 +402,7 @@ void StartVisualTask(void const * argument)
 			}
 		}
 	}
-  /* USER CODE END StartVisualTask */
+	/* USER CODE END StartVisualTask */
 }
 
 /* USER CODE BEGIN Header_StartAcceleroTask */
@@ -436,9 +435,9 @@ void StartAcceleroTask(void const * argument)
 		int16_t msg;
 		lis2dw12_fifo_data_level_get(&lis2dw12, &samples);
 		for (uint8_t i = 0; i < samples; i++) {
-		 // Read acceleration data
-		 lis2dw12_acceleration_raw_get(&lis2dw12, raw_acceleration);
-		 printf("X=%d Y=%d Z=%d\n", raw_acceleration[0], raw_acceleration[1], raw_acceleration[2]);
+			// Read acceleration data
+			lis2dw12_acceleration_raw_get(&lis2dw12, raw_acceleration);
+			printf("X=%d Y=%d Z=%d\n", raw_acceleration[0], raw_acceleration[1], raw_acceleration[2]);
 		}
 		msg = raw_acceleration[0];
 		xQueueSend(xVisualQueueHandle, &msg, 0);
