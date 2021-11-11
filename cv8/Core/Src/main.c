@@ -20,10 +20,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
-#include "lis2dw12_reg.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "lis2dw12_reg.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -433,14 +433,19 @@ void StartAcceleroTask(void const * argument)
 		uint8_t samples;
 		int16_t raw_acceleration[3];
 		int16_t msg;
+		static int32_t time = 0;
 		lis2dw12_fifo_data_level_get(&lis2dw12, &samples);
 		for (uint8_t i = 0; i < samples; i++) {
 			// Read acceleration data
 			lis2dw12_acceleration_raw_get(&lis2dw12, raw_acceleration);
-			printf("X=%d Y=%d Z=%d\n", raw_acceleration[0], raw_acceleration[1], raw_acceleration[2]);
+			if (HAL_GetTick() > time + 1000){
+				printf("X=%d Y=%d Z=%d\n", raw_acceleration[0], raw_acceleration[1], raw_acceleration[2]);
+				time = HAL_GetTick();
+			}
 		}
 		msg = raw_acceleration[0];
 		xQueueSend(xVisualQueueHandle, &msg, 0);
+		osDelay(50);
 	}
 	/* USER CODE END StartAcceleroTask */
 }
