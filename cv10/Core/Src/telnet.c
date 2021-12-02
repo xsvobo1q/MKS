@@ -55,7 +55,7 @@ static void telnet_process_command(char *cmd, struct netconn *conn){
 	token = strtok_r(cmd, " ", &saveptr);
 
 	if (strcasecmp(token, "HELLO") == 0) {
-		sprintf(s, "Komunikace OK\n");
+		sprintf(s, "Komunikace OK\r\n");
 		netconn_write(conn, s, strlen(s), NETCONN_COPY);
 	}else if (strcasecmp(token, "LED1") == 0){
 		token = strtok_r(NULL, " ", &saveptr);
@@ -83,24 +83,24 @@ static void telnet_process_command(char *cmd, struct netconn *conn){
 		status_led2 = HAL_GPIO_ReadPin(LD2_GPIO_Port, LD2_Pin);
 		status_led3 = HAL_GPIO_ReadPin(LD3_GPIO_Port, LD3_Pin);
 		if (status_led1){
-			sprintf(s, "LED1 is ON...\n");
+			sprintf(s, "LED1 is ON...\r\n");
 			netconn_write(conn, s, strlen(s), NETCONN_COPY);
 		}else{
-			sprintf(s, "LED1 is OFF...\n");
+			sprintf(s, "LED1 is OFF...\r\n");
 			netconn_write(conn, s, strlen(s), NETCONN_COPY);
 		}
 		if (status_led2){
-			sprintf(s, "LED2 is ON...\n");
+			sprintf(s, "LED2 is ON...\r\n");
 			netconn_write(conn, s, strlen(s), NETCONN_COPY);
 		}else{
-			sprintf(s, "LED2 is OFF...\n");
+			sprintf(s, "LED2 is OFF...\r\n");
 			netconn_write(conn, s, strlen(s), NETCONN_COPY);
 		}
 		if (status_led3){
-			sprintf(s, "LED3 is ON...\n");
+			sprintf(s, "LED3 is ON...\r\n");
 			netconn_write(conn, s, strlen(s), NETCONN_COPY);
 		}else{
-			sprintf(s, "LED3 is OFF...\n");
+			sprintf(s, "LED3 is OFF...\r\n");
 			netconn_write(conn, s, strlen(s), NETCONN_COPY);
 		}
 	}
